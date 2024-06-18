@@ -1,0 +1,16 @@
+if([SystemInfosProvider.MainGPUTemp] <= 40, 
+    '40', 
+    if([SystemInfosProvider.MainGPUTemp] >= 80, 
+        '139', 
+        format(40 + ([SystemInfosProvider.MainGPUTemp] - 40) * (99 / 40) - 10, '0')
+    )
+) + ','+  
+if(isincreasing(2000, [EngineIgnitionOn]), 160, format([SpeedMph],'0'))+ ','+
+if(isincreasing(2000, [EngineIgnitionOn]), 8000, format([Rpms] * 7500 / [MaxRpm],'0'))+ ','+
+format([DataCorePlugin.Computed.Fuel_Percent],'0')+ ','+
+format([SystemInfosProvider.MainCPUTemp],'00') + ','+
+format([Gear], '0') + ','+
+if(isincreasing(5000, [TurnIndicatorLeft]), 1, 0) + ','+
+if(isincreasing(1000, [TurnIndicatorRight]), 1, 0) + ','+
+format([DataCorePlugin.CurrentDateTime], 'hh') + ','+
+format([DataCorePlugin.CurrentDateTime], 'mm')
