@@ -1,16 +1,60 @@
 if([SystemInfosProvider.MainGPUTemp] <= 40, 
-    '40', 
+    '30', 
     if([SystemInfosProvider.MainGPUTemp] >= 80, 
         '139', 
-        format(40 + ([SystemInfosProvider.MainGPUTemp] - 40) * (99 / 40) - 10, '0')
+        format(40 + ([SystemInfosProvider.MainGPUTemp] - 40) * (99 / 40) - 14, '0')
     )
 ) + ','+  
 if(isincreasing(2000, [EngineIgnitionOn]), 160, format([SpeedMph],'0'))+ ','+
-if(isincreasing(2000, [EngineIgnitionOn]), 8000, format([Rpms] * 7500 / [MaxRpm],'0'))+ ','+
+if(isincreasing(2000, [EngineIgnitionOn]), 8000, 
+    format(if([Rpms] < 200, 0, [Rpms] * 7500 / [MaxRpm]), '0')) + ',' +
 format([DataCorePlugin.Computed.Fuel_Percent],'0')+ ','+
 format([SystemInfosProvider.MainCPUTemp],'00') + ','+
 format([Gear], '0') + ','+
-if(isincreasing(5000, [TurnIndicatorLeft]), 1, 0) + ','+
+if(isincreasing(1000, [TurnIndicatorLeft]), 1, 0) + ','+
 if(isincreasing(1000, [TurnIndicatorRight]), 1, 0) + ','+
 format([DataCorePlugin.CurrentDateTime], 'hh') + ','+
-format([DataCorePlugin.CurrentDateTime], 'mm')
+format([DataCorePlugin.CurrentDateTime], 'mm') + ',' +
+('1') + ',' + 
+if(isincreasing(4000, [EngineIgnitionOn]), 1, 0 )
+
+DO NOT COPY THIS PART THIS IS TO EXPLAIN WHAT IS EACH FORMULA:
+All functions need to be in order as SHCustomProtocol.h to work
+1) COOLANT, the if allows the coolant gauge to measure GPU temperature and calibrates 
+as to show in gauge a low temperature if GPU is at around 40C, to show the gauge in the 
+middle when at 60C and show at the highest temperature if GPU is at 80C or above.
+
+2)SPEED, the if is stating that if the engine is detected to be turned on in-game, the 
+speed needle will move for 2 seconds to 160MPH and then return to its real value.
+
+3)RPM, the  if is stating that if the engine is detected to be turned on in-game, the 
+speed needle will move for 2 seconds to 160MPH and then return to its real value, and the 
+calculation is calibrating the RPMs to always be proportional to the in-game car's RPM
+i.e: If driving an F1 car with peak RPM at 13,000RPMs the Gauge will show 7,500 as 13,000
+meaning the needle in real gauge will be near it's max RPMs.
+
+4)FUEL, simple format statement to display Fuel percent in the fuel gauge.
+
+5)OUTSIDE TEMP, simple format statement to display CPU temperature as outside temperature,
+important to note, outside temperature moves slowly.
+
+6)GEAR, simple format statement to display the gear in the dashboard. IMPORTANT: If the gauge
+came from a manual car, the display will not show gear. Also the display only shows gears up to 
+6th gear, 7th gear will be blank.
+
+7)TURN SIGNAL LEFT - simple format statement to display the turn indicator, unfortunately
+this function is still unstable. WILL NOT CAUSE ANY ISSUES< JUST NOT WORK PROPERLY WHEN TURN SIGNAL
+IS DETECTED.
+
+8)TURN SIGNAL RIGHT - simple format statement to display the turn indicator, unfortunately
+this function is still unstable. WILL NOT CAUSE ANY ISSUES< JUST NOT WORK PROPERLY WHEN TURN SIGNAL
+IS DETECTED.
+
+9)HOUR, simple format statement to display PC's hour in the gauge.
+
+9)MINUTE, simple format statement to display PC's minute in the gauge.
+
+10)ODOMETER, tells simhub to start the odometer.
+
+11)AUDIBLE DING, if is stating that if the engine is detected to be turned on in-game, the 
+audibe seat belt ding will be heard for 4 seconds and then turned off.
